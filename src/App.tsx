@@ -2,6 +2,10 @@ import React, { useEffect, useState } from 'react';
 
 import { authentication } from './services/authentication';
 import { AuthResult } from './services/authentication/authentication';
+import {
+	Organisation,
+	organisationService,
+} from './services/github/organisations/organisations';
 
 const firebaseConfig = {
 	apiKey: process.env.API_KEY,
@@ -17,6 +21,7 @@ export const App = (): JSX.Element => {
 	const [isLoading, setIsLoading] = useState<boolean>(true);
 	const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
 	const [userData, setUserData] = useState<AuthResult>();
+	const [orgs, setOrgs] = useState<Organisation>();
 
 	useEffect(() => {
 		authentication.init(firebaseConfig);
@@ -39,6 +44,12 @@ export const App = (): JSX.Element => {
 		setUserData(data);
 	};
 
+	const getOrgs = async () => {
+		const { data } = await organisationService.get();
+
+		setOrgs(data as Organisation);
+	};
+
 	return (
 		<div>
 			<h1>Hello world</h1>
@@ -50,6 +61,8 @@ export const App = (): JSX.Element => {
 					{userData && (
 						<p>
 							{userData.name} - {userData.token}
+							<button onClick={getOrgs}>fetch orgs</button>
+							{orgs && <span>{orgs.toString()}</span>}
 						</p>
 					)}
 				</>
